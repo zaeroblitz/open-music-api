@@ -30,21 +30,21 @@ class SongsService {
         query = 'SELECT id, title, performer FROM songs';
         if (title) {
             query = {
-                text: 'SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE $1',
+                text: 'SELECT id, title, performer FROM songs WHERE title LIKE $1',
                 values: [`%${title}%`]
             };
         }
 
         if (performer) {
             query = {
-                text: 'SELECT id, title, performer FROM songs WHERE LOWER(performer) LIKE $1',
+                text: 'SELECT id, title, performer FROM songs WHERE performer LIKE $1',
                 values: [`%${performer}%`]
             };
         }
 
         if (title && performer) {
             query = {
-                text: 'SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE $1 AND LOWER(performer) LIKE $2',
+                text: 'SELECT id, title, performer FROM songs WHERE title LIKE $1 AND performer LIKE $2',
                 values: [`%${title}%`, `%${performer}%`]
             };
         }        
