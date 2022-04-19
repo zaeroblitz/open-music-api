@@ -1,4 +1,5 @@
 exports.up = pgm => {
+    // pgm.dropTable('playlist_song_activities');
     pgm.createTable('playlist_song_activities', {
         id: {
             type: 'VARCHAR(50)',
@@ -7,17 +8,16 @@ exports.up = pgm => {
         playlist_id: {
             type: 'VARCHAR(50)',
             notNull: true,
-            references: 'playlists'
+            references: 'playlists',
+            onDelete: 'CASCADE',
         },
         song_id: {
             type: 'VARCHAR(50)',
             notNull: true,
-            references: 'songs'
         },
         user_id: {
             type: 'VARCHAR(50)',
-            notNull: true,            
-            references: 'users'
+            notNull: true,           
         },
         action: {
             type: 'VARCHAR(50)',

@@ -35,15 +35,17 @@ class PlaylistsHandler {
     async getPlaylistsHandler(request, h) {
         const { id: owner } = request.auth.credentials;
         
-        const playlists = await this._service.getPlaylists(owner);
+        const getPlaylists = await this._service.getPlaylists(owner);
         
         return {
             status: 'success',
-            data: playlists.map((playlist) => ({
-                id: playlist.id,
-                name: playlist.name,
-                owner: playlist.username,
-            })),
+            data: {
+                playlists: getPlaylists.map((playlist) => ({
+                    id: playlist.id,
+                    name: playlist.name,
+                    owner: playlist.username,
+                }))
+            },
         };
     }
 
@@ -52,7 +54,7 @@ class PlaylistsHandler {
         const { id: owner } = request.auth.credentials;
 
         await this._service.verifyPlaylistOwner(id, owner);
-        await this._service.deletePlaylist(id, owner);
+        await this._service.deletePlaylist(id);
 
         return {
             status: 'success',

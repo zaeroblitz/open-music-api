@@ -1,9 +1,9 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 
-const AuthError = require('../exceptions/AuthError');
 const NotFoundError = require('../exceptions/NotFoundError');
 const InvariantError = require('../exceptions/InvariantError');
+const AuthorizationError = require('../exceptions/AuthorizationError');
 
 class PlaylistsService {
     constructor(collaborationService) {
@@ -64,10 +64,10 @@ class PlaylistsService {
         return result.rows[0];
     }
 
-    async deletePlaylist(playlistsId, owner) {
+    async deletePlaylist(playlistsId) {
         const query = {
-            text: 'DELETE FROM playlists WHERE id = $1 AND owner = $2 RETURNING id',
-            values: [playlistsId, owner],
+            text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
+            values: [playlistsId],
         };
 
         const result = await this._pool.query(query);
@@ -78,8 +78,8 @@ class PlaylistsService {
     }
 
     async addSongToPlaylist(playlistId, songId) {
+        await this.checkSongIsExists(songId);
         const id = `playlist_songs-${nanoid(16)}`;
-
         const checkSong = await this.checkSongInPlaylist(playlistId, songId);
         
         if (checkSong) {
@@ -146,6 +146,19 @@ class PlaylistsService {
         return true;
     }
 
+    async checkSongIsExists(songId) {
+        const query = {
+            text: 'SELECT * FROM songs WHERE id = $1',
+            values: [songId]
+        }
+
+        const result = await this._pool.query(query);
+
+        if (!result.rows.length) {
+            throw new NotFoundError('Lagu tidak ditemukan');
+        }        
+    }
+
     async addPlaylistSongActivity(playlistId, songId, userId, action) {
         const id = `activity-${nanoid(16)}`;
         const time = new Date().toISOString();
@@ -196,7 +209,7 @@ class PlaylistsService {
         const playlist = result.rows[0];
 
         if (playlist.owner !== owner) {
-            throw new AuthError('Anda tidak berhak mengakses resource ini');
+            throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
         }
     }
 
