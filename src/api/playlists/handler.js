@@ -43,7 +43,7 @@ class PlaylistsHandler {
                 playlists: getPlaylists.map((playlist) => ({
                     id: playlist.id,
                     name: playlist.name,
-                    owner: playlist.username,
+                    username: playlist.username,
                 }))
             },
         };
