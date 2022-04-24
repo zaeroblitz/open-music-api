@@ -98,18 +98,22 @@ class AlbumsService {
     }
 
     async checkLikedAlbum(userId, albumId) {
-        const query = {
-            text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
-            values: [userId, albumId]
-        };
+        const isExists = await this.getAlbumById(albumId);
 
-        const result = await this._pool.query(query);
+        if (isExists) {
+            const query = {
+                text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
+                values: [userId, albumId]
+            };
 
-        if (!result.rowCount) {
-            return false;
-        }
+            const result = await this._pool.query(query);
 
-        return true;
+            if (!result.rowCount) {
+                return false;
+            }
+
+            return true;
+        }        
     }
 
     async removeLikedAlbum(userId, albumId) {
@@ -144,8 +148,12 @@ class AlbumsService {
 
     async countLikedAlbum(albumId) {
         try {
-            const result = await this._cacheService.get(`count-album-likes:${albumId}`);
-            return parseInt(result);
+            const count = await this._cacheService.get(`count-album-likes:${albumId}`);
+            const count_album_likes = {
+                count: parseInt(count),
+                cache: true
+            }
+            return count_album_likes;
         } catch (error) {
             const query = {
                 text: 'SELECT id FROM user_album_likes WHERE album_id = $1',
@@ -153,9 +161,13 @@ class AlbumsService {
             };
 
             const result = await this._pool.query(query);
-            const count_album_likes = result.rowCount;
+            const count = result.rowCount;
 
-            await this._cacheService.set(`count-album-likes:${albumId}`, count_album_likes);
+            await this._cacheService.set(`count-album-likes:${albumId}`, count);
+            const count_album_likes = {
+                count: result.rowCount,
+                cache: false
+            };
 
             return count_album_likes;
         }

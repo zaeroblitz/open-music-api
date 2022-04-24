@@ -5,7 +5,7 @@ const ExportPlaylistValidator = {
     validateExportPlaylistPayload: (payload) => {
         const result = ExportPlaylistsPayloadSchema.validate(payload);
 
-        if (result.error) throw InvariantError(result.error.message);
+        if (result.error) throw new InvariantError(result.error.message);
     }
 }
 

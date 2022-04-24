@@ -94,14 +94,16 @@ class AlbumsHandler {
   async getCountLikedAlbumHandler(request, h) {
     const { id: albumId } = request.params;
 
-    const count = await this._service.countLikedAlbum(albumId);
+    const { count, cache} = await this._service.countLikedAlbum(albumId);    
     
-    return {
-      status: 'succes',
+    const response = h.response({
+      status: 'success',
       data: {
         likes: count,
       }
-    };
+    });
+    cache ? response.header('X-Data-Source', 'cache') : '';
+    return response;
   }
 }
 
