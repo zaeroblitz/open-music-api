@@ -20,7 +20,7 @@ class CollaborationsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new InvariantError('Kolaborasi gagal ditambahkan');
         }
 
@@ -35,7 +35,7 @@ class CollaborationsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new AuthorizationError('Kolaborasi tidak ditemukan');
         }        
     }
@@ -48,8 +48,21 @@ class CollaborationsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new AuthorizationError('Kolaborasi tidak ditemukan');
+        }
+    }
+
+    async checkUserIsExists(userId) {
+        const query = {
+            text: 'SELECT id FROM users WHERE id = $1',
+            values: [userId],
+        };
+
+        const result = await this._pool.query(query);
+
+        if (!result.rowCount) {
+            throw new NotFoundError('Gagal menambahkan kolaborasi, User tidak ditemukan!');
         }
     }
 }

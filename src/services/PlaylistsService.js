@@ -21,7 +21,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new InvariantError('Playlists gagal ditambahkan');
         }
 
@@ -33,15 +33,12 @@ class PlaylistsService {
             text: `SELECT playlists.id, playlists.name, users.username
             FROM playlists
             LEFT JOIN users ON playlists.owner = users.id
-            WHERE playlists.owner = $1`,
+            LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
+            WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
             values: [owner]
         };
 
         const result = await this._pool.query(query);
-
-        if (!result.rows.length) {
-            throw new NotFoundError('Playlists tidak ditemukan');
-        }
 
         return result.rows;
     }
@@ -51,13 +48,14 @@ class PlaylistsService {
             text: `SELECT playlists.id, playlists.name, users.username
             FROM playlists
             LEFT JOIN users ON playlists.owner = users.id
+            LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
             WHERE playlists.id = $1`,
             values: [playlistId]
         };
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Playlist tidak ditemukan');
         }
 
@@ -72,7 +70,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Playlists tidak ditemukan');
         }
     }
@@ -93,7 +91,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new InvariantError(`Gagal menambahkan lagu ke dalam playlist`);
         }
 
@@ -111,7 +109,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Lagu tidak ditemukan');
         }
 
@@ -126,7 +124,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Lagu tidak ditemukan');
         }
     }
@@ -139,7 +137,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             return false;
         }        
 
@@ -154,7 +152,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Lagu tidak ditemukan');
         }        
     }
@@ -170,7 +168,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new InvariantError('Aktivitas Playlist gagal ditambahkan');
         }                
     }
@@ -187,7 +185,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Aktivitas Playlist tidak ditemukan');
         }
 
@@ -202,7 +200,7 @@ class PlaylistsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Playlist tidak ditemukan');
         }
 
